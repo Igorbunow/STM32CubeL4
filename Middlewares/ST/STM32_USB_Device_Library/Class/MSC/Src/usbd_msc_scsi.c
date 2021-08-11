@@ -109,6 +109,18 @@ static int8_t SCSI_Recive_Diagnostic8(USBD_HandleTypeDef *pdev, uint8_t lun,
 								uint8_t *params);
 static int8_t SCSI_Ata_PassThrough12(USBD_HandleTypeDef *pdev, uint8_t lun,
 								uint8_t *params);
+static int8_t SCSI_ReadTOC10(USBD_HandleTypeDef *pdev, uint8_t lun,
+								uint8_t *params);
+static int8_t SCSI_ReadDiscInformation10(USBD_HandleTypeDef *pdev, uint8_t lun,
+								uint8_t *params);
+static int8_t SCSI_ReadTrackInformation10(USBD_HandleTypeDef *pdev, uint8_t lun,
+								uint8_t *params);
+static int8_t SCSI_GetEventStatus10(USBD_HandleTypeDef *pdev, uint8_t lun,
+								uint8_t *params);
+static int8_t SCSI_ModeSelect6(USBD_HandleTypeDef *pdev, uint8_t lun,
+								uint8_t *params);
+static int8_t SCSI_GetConfiguration10(USBD_HandleTypeDef *pdev, uint8_t lun,
+								uint8_t *params);
 
 /**
   * @}
@@ -214,6 +226,30 @@ int8_t SCSI_ProcessCmd(USBD_HandleTypeDef *pdev, uint8_t lun, uint8_t *cmd)
 
     case SCSI_ATA_PASSTHROUGH12:
       ret = SCSI_Ata_PassThrough12(pdev, lun, cmd);
+      break;
+
+    case SCSI_READ_TOC10:
+      ret = SCSI_ReadTOC10(pdev, lun, cmd);
+      break;
+
+    case SCSI_READ_DISC_INFORMATION10:
+      ret = SCSI_ReadDiscInformation10(pdev, lun, cmd);
+      break;
+
+    case SCSI_READ_TRACK_INFORMATION:
+      ret = SCSI_ReadTrackInformation10(pdev, lun, cmd);
+      break;
+
+    case SCSI_GET_EVENT_STATUS10:
+      ret = SCSI_GetEventStatus10(pdev, lun, cmd);
+      break;
+
+    case SCSI_MODE_SELECT6:
+      ret = SCSI_ModeSelect6(pdev, lun, cmd);
+      break;
+
+    case SCSI_GET_CONFIGURATION10:
+      ret = SCSI_GetConfiguration10(pdev, lun, cmd);
       break;
 
     default:
@@ -1297,6 +1333,181 @@ static int8_t SCSI_Ata_PassThrough12(USBD_HandleTypeDef *pdev, uint8_t lun, uint
   return SCSI_Log_Sense10(pdev, lun, params);
 }
 
+
+/**
+  * @brief  SCSI_Read_TOC10
+  *         Process Mode Sense10 command
+  * @param  lun: Logical unit number
+  * @param  params: Command parameters
+  * @retval status
+  */
+static int8_t SCSI_ReadTOC10(USBD_HandleTypeDef *pdev, uint8_t lun, uint8_t *params)
+{
+  UNUSED(lun);
+  USBD_MSC_BOT_HandleTypeDef *hmsc = (USBD_MSC_BOT_HandleTypeDef *)pdev->pClassData;
+  uint16_t len = MODE_SENSE10_LEN;
+
+  if (hmsc == NULL)
+  {
+    return -1;
+  }
+
+
+
+  if (params[8] <= len)
+  {
+    len = params[8];
+  }
+
+  (void)SCSI_UpdateBotData(hmsc, MSC_TOC10_data, len);
+
+  return 0;
+}
+
+
+/**
+  * @brief  SCSI_ReadDiscInformation10
+  *         Process Mode Sense10 command
+  * @param  lun: Logical unit number
+  * @param  params: Command parameters
+  * @retval status
+  */
+static int8_t SCSI_ReadDiscInformation10(USBD_HandleTypeDef *pdev, uint8_t lun, uint8_t *params)
+{
+  UNUSED(lun);
+  USBD_MSC_BOT_HandleTypeDef *hmsc = (USBD_MSC_BOT_HandleTypeDef *)pdev->pClassData;
+  uint16_t len = READ_DISC_INFORMATION10_LEN;
+
+  if (hmsc == NULL)
+  {
+    return -1;
+  }
+
+  if (params[8] <= len)
+  {
+    len = params[8];
+  }
+
+  (void)SCSI_UpdateBotData(hmsc, MSC_Disc_Information10_data, len);
+
+  return 0;
+}
+
+
+/**
+  * @brief  SCSI_ReadTrackInformation10
+  *         Process Mode Sense10 command
+  * @param  lun: Logical unit number
+  * @param  params: Command parameters
+  * @retval status
+  */
+static int8_t SCSI_ReadTrackInformation10(USBD_HandleTypeDef *pdev, uint8_t lun, uint8_t *params)
+{
+  UNUSED(lun);
+  USBD_MSC_BOT_HandleTypeDef *hmsc = (USBD_MSC_BOT_HandleTypeDef *)pdev->pClassData;
+  uint16_t len = READ_TRACK_INFORMATION10_LEN;
+
+  if (hmsc == NULL)
+  {
+    return -1;
+  }
+
+  if (params[8] <= len)
+  {
+    len = params[8];
+  }
+
+  (void)SCSI_UpdateBotData(hmsc, MSC_Track_Information10_data, len);
+
+  return 0;
+}
+
+
+/**
+  * @brief  SCSI_GetEventStatus10
+  *         Process Mode Sense10 command
+  * @param  lun: Logical unit number
+  * @param  params: Command parameters
+  * @retval status
+  */
+static int8_t SCSI_GetEventStatus10(USBD_HandleTypeDef *pdev, uint8_t lun, uint8_t *params)
+{
+  UNUSED(lun);
+  USBD_MSC_BOT_HandleTypeDef *hmsc = (USBD_MSC_BOT_HandleTypeDef *)pdev->pClassData;
+  uint16_t len = GET_EVENT_STATUS_LEN;
+
+  if (hmsc == NULL)
+  {
+    return -1;
+  }
+
+  if (params[8] <= len)
+  {
+    len = params[8];
+  }
+
+  (void)SCSI_UpdateBotData(hmsc, MSC_Event_Status10_data, len);
+
+  return 0;
+}
+
+
+/**
+  * @brief  SCSI_ModeSelect6
+  *         Process Mode Sense10 command
+  * @param  lun: Logical unit number
+  * @param  params: Command parameters
+  * @retval status
+  */
+static int8_t SCSI_ModeSelect6(USBD_HandleTypeDef *pdev, uint8_t lun, uint8_t *params)
+{
+  UNUSED(lun);
+  USBD_MSC_BOT_HandleTypeDef *hmsc = (USBD_MSC_BOT_HandleTypeDef *)pdev->pClassData;
+  uint16_t len = MODE_SELECT6_LEN;
+
+  if (hmsc == NULL)
+  {
+    return -1;
+  }
+
+  if (params[8] <= len)
+  {
+    len = params[8];
+  }
+
+  (void)SCSI_UpdateBotData(hmsc, MSC_ModeSelect6_data, len);
+
+  return 0;
+}
+
+
+/**
+  * @brief  SCSI_ModeSelect6
+  *         Process Mode Sense10 command
+  * @param  lun: Logical unit number
+  * @param  params: Command parameters
+  * @retval status
+  */
+static int8_t SCSI_GetConfiguration10(USBD_HandleTypeDef *pdev, uint8_t lun, uint8_t *params)
+{
+  UNUSED(lun);
+  USBD_MSC_BOT_HandleTypeDef *hmsc = (USBD_MSC_BOT_HandleTypeDef *)pdev->pClassData;
+  uint16_t len = GET_CONFIGURATION10_LEN;
+
+  if (hmsc == NULL)
+  {
+    return -1;
+  }
+
+  if (params[8] <= len)
+  {
+    len = params[8];
+  }
+
+  (void)SCSI_UpdateBotData(hmsc, MSC_GetConfiguration10_data, len);
+
+  return 0;
+}
 
 /**
   * @}

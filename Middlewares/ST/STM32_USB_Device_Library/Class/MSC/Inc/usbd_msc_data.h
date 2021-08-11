@@ -42,6 +42,12 @@ extern "C" {
   */
 #define MODE_SENSE6_LEN                    0x04U
 #define MODE_SENSE10_LEN                   0x08U
+#define READ_TOC10_LEN                     0x0CU
+#define READ_DISC_INFORMATION10_LEN        0x22U
+#define READ_TRACK_INFORMATION10_LEN       0x24U
+#define MODE_SELECT6_LEN                   0x08U
+#define GET_CONFIGURATION10_LEN            0x08U
+#define GET_EVENT_STATUS_LEN               0x08U
 #define LENGTH_INQUIRY_PAGE00              0x06U
 #define LENGTH_INQUIRY_PAGE80              0x08U
 #define LENGTH_FORMAT_CAPACITIES           0x14U
@@ -75,6 +81,12 @@ extern uint8_t MSC_Page00_Inquiry_Data[LENGTH_INQUIRY_PAGE00];
 extern uint8_t MSC_Page80_Inquiry_Data[LENGTH_INQUIRY_PAGE80];
 extern uint8_t MSC_Mode_Sense6_data[MODE_SENSE6_LEN];
 extern uint8_t MSC_Mode_Sense10_data[MODE_SENSE10_LEN];
+extern uint8_t MSC_TOC10_data[READ_TOC10_LEN];
+extern uint8_t MSC_Disc_Information10_data[READ_DISC_INFORMATION10_LEN];
+extern uint8_t MSC_Track_Information10_data[READ_TRACK_INFORMATION10_LEN];
+extern uint8_t MSC_Event_Status10_data[GET_EVENT_STATUS_LEN];
+extern uint8_t MSC_ModeSelect6_data[MODE_SELECT6_LEN];
+extern uint8_t MSC_GetConfiguration10_data[GET_CONFIGURATION10_LEN];
 
 /**
   * @}
